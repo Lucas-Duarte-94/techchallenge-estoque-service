@@ -7,6 +7,9 @@ import com.tech_challenge.fiap_estoque_service.exception.ReservationCannotBeCanc
 import com.tech_challenge.fiap_estoque_service.exception.ReservationNotFoundException;
 import com.tech_challenge.fiap_estoque_service.gateway.EstoqueRepository;
 import com.tech_challenge.fiap_estoque_service.gateway.ReservaEstoqueRepository;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +20,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class UpdateStatusToCancelUseCaseImpl implements UpdateStatusToCancelUseCase {
+    private final Logger logger = LoggerFactory.getLogger(UpdateStatusToCancelUseCaseImpl.class);
 
     private final ReservaEstoqueRepository reservaRepository;
     private final EstoqueRepository estoqueRepository;
@@ -30,7 +34,9 @@ public class UpdateStatusToCancelUseCaseImpl implements UpdateStatusToCancelUseC
     @Override
     @Transactional
     public void updateStatusToCancel(String pedidoId) {
+        logger.info("metodo findByPedidoId " + pedidoId);
         List<ReservaEstoque> reservas = reservaRepository.findByPedidoId(pedidoId);
+        logger.info("reservas: " + reservas);
 
         if (reservas.isEmpty()) {
             throw new ReservationNotFoundException("Reserva não encontrada para o pedido: " + pedidoId);

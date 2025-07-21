@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.tech_challenge.fiap_estoque_service.exception.OutOfStockException;
 import com.tech_challenge.fiap_estoque_service.exception.ProductNotFoundException;
+import com.tech_challenge.fiap_estoque_service.exception.ReservationCannotBeCancelledException;
+import com.tech_challenge.fiap_estoque_service.exception.ReservationNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionController {
@@ -18,5 +20,16 @@ public class GlobalExceptionController {
     @ExceptionHandler(OutOfStockException.class)
     public ResponseEntity<String> handleOutOfStockException(OutOfStockException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(ReservationNotFoundException.class)
+    public ResponseEntity<String> handleReservationNotFoundException(ReservationNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(ReservationCannotBeCancelledException.class)
+    public ResponseEntity<String> handleReservationCannotBeCancelledException(
+            ReservationCannotBeCancelledException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 }
