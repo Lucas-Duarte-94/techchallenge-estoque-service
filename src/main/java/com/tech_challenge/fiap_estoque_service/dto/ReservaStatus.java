@@ -7,3 +7,6 @@ public enum ReservaStatus {
     CANCELADA,
     FINALIZADO
 }
+
+// Status FINALIZADO será para quando o pedido ja tiver sido entregue ao cliente
+// e não for possivel devolver

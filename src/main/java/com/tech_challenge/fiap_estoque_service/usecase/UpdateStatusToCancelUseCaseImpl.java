@@ -6,6 +6,7 @@ import com.tech_challenge.fiap_estoque_service.dto.ReservaStatus;
 import com.tech_challenge.fiap_estoque_service.exception.ReservationCannotBeCancelledException;
 import com.tech_challenge.fiap_estoque_service.exception.ReservationNotFoundException;
 import com.tech_challenge.fiap_estoque_service.gateway.EstoqueRepository;
+
 import com.tech_challenge.fiap_estoque_service.gateway.ReservaEstoqueRepository;
 
 import org.slf4j.Logger;
@@ -29,6 +30,7 @@ public class UpdateStatusToCancelUseCaseImpl implements UpdateStatusToCancelUseC
             EstoqueRepository estoqueRepository) {
         this.reservaRepository = reservaRepository;
         this.estoqueRepository = estoqueRepository;
+
     }
 
     @Override
@@ -43,11 +45,12 @@ public class UpdateStatusToCancelUseCaseImpl implements UpdateStatusToCancelUseC
         }
 
         boolean anyFinalized = reservas.stream()
-                .anyMatch(reserva -> reserva.getStatus() == ReservaStatus.FINALIZADO);
+                .anyMatch(reserva -> reserva.getStatus() == ReservaStatus.FINALIZADO
+                        || reserva.getStatus() == ReservaStatus.CONFIRMADA);
 
         if (anyFinalized) {
             throw new ReservationCannotBeCancelledException(
-                    "Não é possível cancelar reservas com status FINALIZADO para o pedido: " + pedidoId);
+                    "Não é possível cancelar reservas com status FINALIZADO ou CONFIRMADA para o pedido");
         }
 
         boolean allCancelled = reservas.stream()
@@ -62,10 +65,10 @@ public class UpdateStatusToCancelUseCaseImpl implements UpdateStatusToCancelUseC
                 .collect(Collectors.groupingBy(ReservaEstoque::getProductSKU,
                         Collectors.summingInt(ReservaEstoque::getQuantidadeReservada)));
 
-        Map<String, Integer> quantidadesParaDevolverReal = reservas.stream()
-                .filter(reserva -> reserva.getStatus() == ReservaStatus.CONFIRMADA)
-                .collect(Collectors.groupingBy(ReservaEstoque::getProductSKU,
-                        Collectors.summingInt(ReservaEstoque::getQuantidadeReservada)));
+        // Map<String, Integer> quantidadesParaDevolverReal = reservas.stream()
+        // .filter(reserva -> reserva.getStatus() == ReservaStatus.CONFIRMADA)
+        // .collect(Collectors.groupingBy(ReservaEstoque::getProductSKU,
+        // Collectors.summingInt(ReservaEstoque::getQuantidadeReservada)));
 
         List<String> skusParaAtualizar = reservas.stream()
                 .map(ReservaEstoque::getProductSKU)
@@ -79,10 +82,11 @@ public class UpdateStatusToCancelUseCaseImpl implements UpdateStatusToCancelUseC
                 return qtd;
             });
 
-            quantidadesParaDevolverReal.computeIfPresent(estoque.getProductSKU(), (sku, qtd) -> {
-                estoque.setQuantidadeReal(estoque.getQuantidadeReal() + qtd);
-                return qtd;
-            });
+            // quantidadesParaDevolverReal.computeIfPresent(estoque.getProductSKU(), (sku,
+            // qtd) -> {
+            // estoque.setQuantidadeReal(estoque.getQuantidadeReal() + qtd);
+            // return qtd;
+            // });
             estoque.setUpdatedAt(LocalDateTime.now());
         }
 

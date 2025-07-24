@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 
 import com.tech_challenge.fiap_estoque_service.dto.EstoquePublicDTO;
 import com.tech_challenge.fiap_estoque_service.dto.PedidoDTO;
+import com.tech_challenge.fiap_estoque_service.exception.ProductNotFoundException;
 import com.tech_challenge.fiap_estoque_service.gateway.EstoqueRepository;
 
 @Service
@@ -23,7 +24,7 @@ public class EstoqueUseCaseImpl implements EstoqueUseCase {
 
     @Override
     public EstoquePublicDTO getEstoqueByProductSKU(String productSKU) {
-        var estoque = this.estoqueRepository.findById(productSKU).orElse(null);
+        var estoque = this.estoqueRepository.findById(productSKU).orElseThrow(ProductNotFoundException::new);
         return new EstoquePublicDTO(estoque.getProductSKU(), estoque.getQuantidadeDisponivel());
     }
 

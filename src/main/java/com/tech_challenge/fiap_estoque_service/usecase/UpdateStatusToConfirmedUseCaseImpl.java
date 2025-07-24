@@ -5,7 +5,13 @@ import com.tech_challenge.fiap_estoque_service.domain.entity.ReservaEstoque;
 import com.tech_challenge.fiap_estoque_service.dto.ReservaStatus;
 import com.tech_challenge.fiap_estoque_service.exception.ReservationNotFoundException;
 import com.tech_challenge.fiap_estoque_service.gateway.EstoqueRepository;
+import com.tech_challenge.fiap_estoque_service.gateway.PedidoClient;
 import com.tech_challenge.fiap_estoque_service.gateway.ReservaEstoqueRepository;
+
+import feign.FeignException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,14 +22,18 @@ import java.util.stream.Collectors;
 
 @Component
 public class UpdateStatusToConfirmedUseCaseImpl implements UpdateStatusToConfirmedUseCase {
+    private final Logger logger = LoggerFactory.getLogger(UpdateStatusToConfirmedUseCaseImpl.class);
 
     private final ReservaEstoqueRepository reservaRepository;
     private final EstoqueRepository estoqueRepository;
+    private final PedidoClient pedidoClient;
 
     public UpdateStatusToConfirmedUseCaseImpl(ReservaEstoqueRepository reservaRepository,
-            EstoqueRepository estoqueRepository) {
+            EstoqueRepository estoqueRepository,
+            PedidoClient pedidoClient) {
         this.reservaRepository = reservaRepository;
         this.estoqueRepository = estoqueRepository;
+        this.pedidoClient = pedidoClient;
     }
 
     @Override
@@ -67,5 +77,15 @@ public class UpdateStatusToConfirmedUseCaseImpl implements UpdateStatusToConfirm
 
         estoqueRepository.saveAll(estoquesParaAtualizar);
         reservaRepository.saveAll(reservas);
+
+        this.updatePedidoService(pedidoId);
+    }
+
+    private void updatePedidoService(String pedidoId) {
+        try {
+            this.pedidoClient.changeToClosedSuccess(pedidoId);
+        } catch (FeignException ex) {
+            logger.error("Erro ao chamar o serviço de pedido.\n - Stacktrace: {}", ex);
+        }
     }
 }
