@@ -2,6 +2,7 @@ package com.tech_challenge.fiap_estoque_service.scheduler;
 
 import com.tech_challenge.fiap_estoque_service.domain.entity.Estoque;
 import com.tech_challenge.fiap_estoque_service.domain.entity.ReservaEstoque;
+import com.tech_challenge.fiap_estoque_service.dto.PedidoRequestDTO;
 import com.tech_challenge.fiap_estoque_service.dto.ReservaStatus;
 import com.tech_challenge.fiap_estoque_service.gateway.EstoqueRepository;
 import com.tech_challenge.fiap_estoque_service.gateway.PedidoClient;
@@ -35,7 +36,7 @@ public class ReservaExpirationScheduler {
         this.pedidoClient = pedidoClient;
     }
 
-    @Scheduled(fixedRate = 60000) // Roda a cada 60 segundos
+    @Scheduled(fixedRate = 2 * 60000) // Roda a cada 2 minutos.
     @Transactional
     public void cancelarReservasExpiradas() {
         logger.info("Iniciando verificação de reservas expiradas...");
@@ -78,7 +79,7 @@ public class ReservaExpirationScheduler {
 
     private void updatePedidoService(String pedidoId) {
         try {
-            this.pedidoClient.changeToClosedExpired(pedidoId);
+            this.pedidoClient.changeToClosedExpired(new PedidoRequestDTO(pedidoId));
         } catch (FeignException ex) {
             logger.error("Erro ao chamar o serviço de pedido.\n - Stacktrace: {}", ex);
         }

@@ -26,14 +26,11 @@ public class UpdateStatusToConfirmedUseCaseImpl implements UpdateStatusToConfirm
 
     private final ReservaEstoqueRepository reservaRepository;
     private final EstoqueRepository estoqueRepository;
-    private final PedidoClient pedidoClient;
 
     public UpdateStatusToConfirmedUseCaseImpl(ReservaEstoqueRepository reservaRepository,
-            EstoqueRepository estoqueRepository,
-            PedidoClient pedidoClient) {
+            EstoqueRepository estoqueRepository) {
         this.reservaRepository = reservaRepository;
         this.estoqueRepository = estoqueRepository;
-        this.pedidoClient = pedidoClient;
     }
 
     @Override
@@ -78,14 +75,14 @@ public class UpdateStatusToConfirmedUseCaseImpl implements UpdateStatusToConfirm
         estoqueRepository.saveAll(estoquesParaAtualizar);
         reservaRepository.saveAll(reservas);
 
-        this.updatePedidoService(pedidoId);
+        // this.updatePedidoService(pedidoId);
     }
 
-    private void updatePedidoService(String pedidoId) {
-        try {
-            this.pedidoClient.changeToClosedSuccess(pedidoId);
-        } catch (FeignException ex) {
-            logger.error("Erro ao chamar o serviço de pedido.\n - Stacktrace: {}", ex);
-        }
-    }
+    // private void updatePedidoService(String pedidoId) {
+    // try {
+    // this.pedidoClient.changeToClosedSuccess(pedidoId);
+    // } catch (FeignException ex) {
+    // logger.error("Erro ao chamar o serviço de pedido.\n - Stacktrace: {}", ex);
+    // }
+    // }
 }
