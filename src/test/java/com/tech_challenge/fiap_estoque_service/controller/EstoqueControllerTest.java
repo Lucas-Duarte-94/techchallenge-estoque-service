@@ -52,7 +52,7 @@ class EstoqueControllerTest {
 
         ResponseEntity<Void> response = estoqueController.reserveStock(pedidoDTO);
 
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
         verify(estoqueUseCase, times(1)).updateEstoque(pedidoDTO);
     }
 
