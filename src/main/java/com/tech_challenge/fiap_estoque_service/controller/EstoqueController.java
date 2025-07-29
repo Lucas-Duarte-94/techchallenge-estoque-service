@@ -8,6 +8,7 @@ import com.tech_challenge.fiap_estoque_service.dto.EstoquePublicDTO;
 import com.tech_challenge.fiap_estoque_service.dto.PedidoDTO;
 import com.tech_challenge.fiap_estoque_service.dto.PedidoIdRequestDTO;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,7 +33,7 @@ public class EstoqueController {
     @PostMapping
     public ResponseEntity<Void> reserveStock(@RequestBody PedidoDTO pedidoDTO) {
         this.estoqueUseCase.updateEstoque(pedidoDTO);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/cancel")
